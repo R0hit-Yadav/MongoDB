@@ -36,3 +36,8 @@ db.Student.find().sort({ age: -1 }).limit(1).project({ name: 1 });
 // is equal to 31. If not such document available than insert the document with updated values.
 // 4) Display position and name of the employee having lowest salary.
 
+db.employee.insertMany([
+    { name: "rohit", age: 30, position: "Full Stack Developer", salary: 80000 },
+    { name: "jay", age: 35, position: "Backend Developer", salary: 75000 },
+    { name: "dev", age: 31, position: "Full Stack Developer", salary: 85000 }
+]);
