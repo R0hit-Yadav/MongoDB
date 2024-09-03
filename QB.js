@@ -162,7 +162,6 @@ const mySchema = new Schema({
     date: {type: Date,default: Date.now}
 });
 const MyModel = mongoose.model('MyModel', mySchema);
-
 module.exports = MyModel;
 
 
@@ -257,22 +256,12 @@ db.student.find({ name: { $regex: /^[A-Za-z]{3,10}$/ } });
 // already created having name(string), surname(string), age(Number), active(Boolean) fields.
 
 const mongoose = require('mongoose');
-const uri = 'mongodb://localhost:27017/yourDatabaseName';
-mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true })
+mongoose.connect('mongodb://localhost:27017/yourDatabaseName', { useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => {
         console.log('Connected to MongoDB');
         
         // Define the schema and model (if not already defined elsewhere)
-        const studentSchema = new mongoose.Schema({
-            name: { type: String, required: true },
-            surname: { type: String, required: true },
-            age: { type: Number, required: true },
-            active: { type: Boolean, required: true }
-        });
-
         const Student = mongoose.model('Student', studentSchema);
-
-        // Array of documents to insert
         const students = [
             { name: 'jay', surname: 'doshi', age: 25, active: true },
             { name: 'yash', surname: 'parekh', age: 30, active: false },
@@ -280,7 +269,6 @@ mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true })
             { name: 'ronil', surname: 'patel', age: 28, active: false }
         ];
 
-        // Insert documents
         Student.insertMany(students)
             .then(() => {
                 console.log('Documents inserted successfully');
@@ -324,11 +312,9 @@ db.student.find({ age: { $gt: 15 }, name: "BBB" }).explain("executionStats");
 //  (5)city allowed values are “baroda”,”surat” and “ahmedabad” only
 
 const mongoose = require('mongoose');
-
 mongoose.connect('mongodb://localhost:27017/yourDatabaseName', { useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => {
         console.log('Connected to MongoDB');
-        
     
         const userSchema = new mongoose.Schema({
             name: {
@@ -362,26 +348,16 @@ mongoose.connect('mongodb://localhost:27017/yourDatabaseName', { useNewUrlParser
                 enum: ['baroda', 'surat', 'ahmedabad']  
             }
         });
-
         const User = mongoose.model('User', userSchema);
 
         const newUser = new User({
-            name: 'John',
-            surname: 'doe',
-            email: 'john.doe@example.com',
-            password: 'password123',
+            name: 'jay',
+            surname: 'doshi',
+            email: 'jaydosh@123.com',
+            password: '123',
             city: 'surat'
         });
-
         newUser.save()
-            .then(doc => {
-                console.log('User saved:', doc);
-                mongoose.connection.close();
-            })
-            .catch(err => {
-                console.error('Error saving user:', err);
-                mongoose.connection.close();
-            });
     })
     .catch(err => {
         console.error('Error connecting to MongoDB:', err);
@@ -396,9 +372,7 @@ mongoose.connect('mongodb://localhost:27017/yourDatabaseName', { useNewUrlParser
 
 //user.js
 const mongoose = require('mongoose');
-
-// Define the schema
-const userSchema = new mongoose.Schema({
+const userSchema1 = new mongoose.Schema({
     username: {
         type: String,
         required: true,
@@ -409,61 +383,41 @@ const userSchema = new mongoose.Schema({
         required: true
     }
 });
+const User1 = mongoose.model('User', userSchema1);
+module.exports = User1;
 
-// Create the model
-const User = mongoose.model('User', userSchema);
-
-module.exports = User;
 
 //app.js
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
-const User = require('./models/user');
+const User1 = require('./models/user1');
 const path = require('path');
 
-// Initialize express app
-const app = express();
-const port = 3000;
 
-// Connect to MongoDB
-mongoose.connect('mongodb://localhost:27017/loginDB', {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-})
+const app = express();
+mongoose.connect('mongodb://localhost:27017/loginDB',)
 .then(() => console.log('Connected to MongoDB'))
 .catch(err => console.error('MongoDB connection error:', err));
 
-// Middleware
+
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'views')));
 
-// Set EJS as the templating engine
 app.set('view engine', 'ejs');
 
-// Routes
-app.get('/', (req, res) => {
+
+app.get('/', (req, res) => 
+{
     res.render('index');
 });
 
-app.post('/submit', async (req, res) => {
+app.post('/submit', async (req, res) => 
+    {
     const { username, password } = req.body;
-
-    // Create a new user
     const newUser = new User({ username, password });
-
-    try {
-        await newUser.save();
-        res.send('User registered successfully!');
-    } catch (error) {
-        console.error('Error saving user:', error);
-        res.status(500).send('Error registering user');
-    }
-});
-
-app.listen(port, () => {
-    console.log(`Server running at http://localhost:${port}`);
-});
+    await newUser.save();
+});app.listen(5000)
 
 
 //index.html
@@ -496,8 +450,6 @@ app.listen(port, () => {
 // script. Write required files.
 
 const mongoose = require('mongoose');
-
-// Define the schema
 const recordSchema = new mongoose.Schema({
     text: {
         type: String,
@@ -507,48 +459,29 @@ const recordSchema = new mongoose.Schema({
 
 // Create the model
 const Record = mongoose.model('Record', recordSchema);
-
 module.exports = Record;
+
 
 
 
 const express = require('express');
 const mongoose = require('mongoose');
-const bodyParser = require('body-parser');
 const cors = require('cors');
 const Record = require('./models/record');
 
-const app = express();
-const port = 5000;
 
 // Connect to MongoDB
-mongoose.connect('mongodb://localhost:27017/fullstackDB', {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-})
+mongoose.connect('mongodb://localhost:27017/fullstackDB')
 .then(() => console.log('Connected to MongoDB'))
 .catch(err => console.error('MongoDB connection error:', err));
 
-// Middleware
-app.use(cors());
-app.use(bodyParser.json());
 
-// Routes
 app.post('/api/records', async (req, res) => {
     const { text } = req.body;
     const newRecord = new Record({ text });
 
-    try {
-        await newRecord.save();
-        res.status(201).json(newRecord);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
-app.listen(port, () => {
-    console.log(`Server running on http://localhost:${port}`);
-});
+    await newRecord.save();
+});app.listen(5000)
 
 
 
@@ -574,12 +507,7 @@ function App() {
         <div className="App">
             <h1>Insert Record</h1>
             <form onSubmit={handleSubmit}>
-                <input
-                    type="text"
-                    value={text}
-                    onChange={(e) => setText(e.target.value)}
-                    required
-                />
+                <input type="text" value={text} onChange={(e) => setText(e.target.value)} required/>
                 <button type="submit">Submit</button>
             </form>
         </div>
@@ -620,51 +548,38 @@ db.student.find({ age: { $gt: 15 } });
 // saved in data table inside MongoDB database named student. 
 
 // server.js
+const app = express();
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 
-const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 
-// Connect to MongoDB
-mongoose.connect('mongodb://localhost:27017/student', {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-});
+mongoose.connect('mongodb://localhost:27017/student');
 
-const studentSchema = new mongoose.Schema({
+const studentSchemaa = new mongoose.Schema({
     name: String,
     rollno: Number,
     totalmarks: Number
 });
 
-const Student = mongoose.model('Student', studentSchema);
+const Student2 = mongoose.model('Student', studentSchemaa);
 
-// Route to handle form submission
 app.post('/add-student', async (req, res) => {
     const { name, rollno, totalmarks } = req.body;
-    try {
-        const student = new Student({ name, rollno, totalmarks });
-        await student.save();
-        res.status(201).json(student);
-    } catch (error) {
-        res.status(400).json({ message: error.message });
-    }
-});
 
-app.listen(5000, () => {
-    console.log('Server is running on port 5000');
-});
+    const student = new Student({ name, rollno, totalmarks });
+    await student.save();
+});app.listen(5000)
 
 
 // src/StudentForm.js
 import React, { useState } from 'react';
 import axios from 'axios';
 
-const StudentForm = () => {
+const StudentForm2 = () => {
     const [name, setName] = useState('');
     const [rollno, setRollno] = useState('');
     const [totalmarks, setTotalmarks] = useState('');
@@ -724,7 +639,7 @@ const StudentForm = () => {
     );
 };
 
-export default StudentForm;
+export default StudentForm2;
 
 
 
@@ -748,42 +663,30 @@ export default App;
 // button,insert value of username in the database.(Note: .html and .js file required)
 
 // server.js
+const app = express();
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const path = require('path');
 
-const app = express();
+
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Connect to MongoDB
-mongoose.connect('mongodb://localhost:27017/userdb', {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-});
+mongoose.connect('mongodb://localhost:27017/userdb');
 
-const userSchema = new mongoose.Schema({
+const userSchema4 = new mongoose.Schema({
     username: String
 });
 
-const User = mongoose.model('User', userSchema);
+const User4 = mongoose.model('User', userSchema4);
 
-// Route to handle form submission
 app.post('/submit-username', async (req, res) => {
-    const { username } = req.body;
-    try {
-        const user = new User({ username });
-        await user.save();
-        res.status(201).json({ message: 'Username saved successfully' });
-    } catch (error) {
-        res.status(400).json({ message: error.message });
-    }
-});
 
-app.listen(5000, () => {
-    console.log('Server is running on port 5000');
-});
+    const { username } = req.body;
+    const user = new User4({ username });
+    await user.save();
+});app.listen(5000)
 
 
 
@@ -809,7 +712,8 @@ app.listen(5000, () => {
 
 
 // public/script.js
-document.getElementById('usernameForm').addEventListener('submit', async function(event) {
+document.getElementById('usernameForm4').addEventListener('submit', async function(event) 
+{
     event.preventDefault(); 
 
     const username = document.getElementById('username').value;
@@ -846,17 +750,11 @@ document.getElementById('usernameForm').addEventListener('submit', async functio
 
 // schema.js
 const mongoose = require('mongoose');
+mongoose.connect('mongodb://localhost:27017/validationdb');
 
-// Connect to MongoDB
-mongoose.connect('mongodb://localhost:27017/validationdb', {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-});
+const { Schema5 } = mongoose;
 
-const { Schema } = mongoose;
-
-// Define the schema with validations
-const userSchema = new Schema({
+const userSchema = new Schema5({
     name: {
         type: String,
         required: true,
@@ -877,28 +775,22 @@ const userSchema = new Schema({
     }
 });
 
-// Create the model
+
 const User = mongoose.model('User', userSchema);
 
 // Example of creating a document
 async function createUser() {
-    try {
-        const user = new User({
-            name: 'JohnDoe',
-            age: 25,
-            gender: 'MALE'
-        });
-        await user.save();
-        console.log('User created:', user);
-    } catch (error) {
-        console.error('Error creating user:', error.message);
-    }
+    const user = new User({
+        name: 'jay',
+        age: 25,
+        gender: 'male'
+    });
+    await user.save();
 }
 
-// Call the createUser function to test the schema
+
 createUser();
 
-// Close the MongoDB connection when done
 mongoose.connection.on('connected', () => {
     console.log('Connected to MongoDB');
 });
@@ -976,53 +868,29 @@ export default App;
 
 
 // backend/server.js
+const app = express();
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 
-const app = express();
-const port = 5000;
-
-// Middleware
 app.use(cors());
 app.use(bodyParser.json());
 
-// MongoDB connection
-mongoose.connect('mongodb://localhost:27017/mydb', {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-});
+mongoose.connect('mongodb://localhost:27017/mydb');
 
 const db = mongoose.connection;
-db.on('error', console.error.bind(console, 'connection error:'));
-db.once('open', () => {
-    console.log('Connected to MongoDB');
-});
 
-// Define Schema and Model
 const nameSchema = new mongoose.Schema({
     name: { type: String, required: true }
 });
-
 const Name = mongoose.model('Name', nameSchema);
 
-// Define Routes
 app.post('/api/submit', async (req, res) => {
     const { name } = req.body;
-    try {
-        const newName = new Name({ name });
-        await newName.save();
-        res.status(200).send('Name saved successfully');
-    } catch (error) {
-        res.status(500).send('Error saving name');
-    }
-});
-
-// Start server
-app.listen(port, () => {
-    console.log(`Server is running on http://localhost:${port}`);
-});
+    const newName = new Name({ name });
+    await newName.save();
+});app.listen(5000)
 
 
 //QB-561
@@ -1093,18 +961,12 @@ db.movie.find({ release_year: { $lte: 2010 } }).explain("executionStats");
 // “ PUNE” & “ BANGALORE ” only.
 
 const mongoose = require('mongoose');
+mongoose.connect('mongodb://localhost:27017/applicantdata');
 
-// Connect to MongoDB
-mongoose.connect('mongodb://localhost:27017/applicantdata', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
-
-// Define the schema
-const applicantSchema = new mongoose.Schema({
+const applicantSchemas = new mongoose.Schema({
   Firstname: {
     type: String,
-    trim: true,  // Remove leading/trailing spaces
+    trim: true,  
     required: [true, 'Firstname is required'],
     minlength: [3, 'Firstname must be at least 3 characters long'],
     maxlength: [10, 'Firstname cannot be more than 10 characters long'],
@@ -1120,7 +982,6 @@ const applicantSchema = new mongoose.Schema({
     required: [true, 'Email is required'],
     validate: {
       validator: function(v) {
-        // Simple email validation regex
         return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
       },
       message: props => `${props.value} is not a valid email!`,
@@ -1129,7 +990,7 @@ const applicantSchema = new mongoose.Schema({
   citychoice: {
     type: String,
     required: [true, 'Citychoice is required'],
-    uppercase: true,  // Convert to uppercase
+    uppercase: true,  
     enum: {
       values: ['AHMEDABAD', 'PUNE', 'BANGALORE'],
       message: 'Citychoice must be either AHMEDABAD, PUNE, or BANGALORE',
@@ -1137,27 +998,17 @@ const applicantSchema = new mongoose.Schema({
   },
 });
 
-// Create the model
-const Applicant = mongoose.model('Applicant', applicantSchema);
 
-// Create a random applicant document
-const newApplicant = new Applicant({
-  Firstname: 'John Doe',
+const Applicants = mongoose.model('Applicant', applicantSchemas);
+
+const newApplicants = new Applicants({
+  Firstname: 'rohit yadav',
   age: 25,
-  email: 'johndoe@example.com',
+  email: 'rohit@gmail.com',
   citychoice: 'PUNE',
 });
+newApplicants.save()
 
-// Save the document to the database
-newApplicant.save()
-  .then(doc => {
-    console.log('Document saved:', doc);
-    mongoose.connection.close();  // Close the connection after saving
-  })
-  .catch(err => {
-    console.error('Error saving document:', err);
-    mongoose.connection.close();  // Close the connection on error
-  });
 
 
 // QB-564
@@ -1171,18 +1022,8 @@ newApplicant.save()
 // (2) Retrieve only name & age of documents having age greater than 28 & less than equal to 30
 
 
-db.faculty.updateOne(
-    { subject: "JAVA-2" },
-    {
-      $set: { name: "DEF", age: 32 },
-    },
-    { upsert: true }  // Insert the document if it does not exist
-  );
-
-  db.faculty.find(
-    { age: { $gt: 28, $lte: 30 } },
-    { _id: 0, name: 1, age: 1 }  // Project only the `name` and `age` fields
-  );
+db.faculty.updateOne({ subject: "JAVA-2" },{$set: { name: "DEF", age: 32 }},{ upsert: true });
+ db.faculty.find({ age: { $gt: 28, $lte: 30 } },{ _id: 0, name: 1, age: 1 });
 
   
 //QB-565
@@ -1193,16 +1034,11 @@ db.faculty.updateOne(
 // (2) age must accept a value from 1<=age<=100 only
 
 const mongoose = require('mongoose');
-const { Schema } = mongoose;
+const { Schemax } = mongoose;
 
-// Connect to MongoDB (adjust the connection string as needed)
-mongoose.connect('mongodb://localhost:27017/yourDatabaseName', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-});
+mongoose.connect('mongodb://localhost:27017/yourDatabaseName');
 
-// Define the schema
-const applicantSchema = new Schema({
+const applicantSchemax = new Schema({
   name: {
     type: String,
     trim: true,
@@ -1219,23 +1055,15 @@ const applicantSchema = new Schema({
   }
 });
 
-// Create the model
-const Applicant = mongoose.model('Applicant', applicantSchema);
+const Applicant = mongoose.model('Applicant', applicantSchemax);
 
-// Example usage: create a new document
 const newApplicant = new Applicant({
   name: 'abc',
   age: 25
 });
 
-// Save the document
 newApplicant.save()
-  .then(doc => {
-    console.log('Document saved:', doc);
-  })
-  .catch(err => {
-    console.error('Error saving document:', err);
-  });
+  
 
 
 
