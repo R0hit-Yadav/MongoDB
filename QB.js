@@ -256,10 +256,9 @@ db.student.find({ name: { $regex: /^[A-Za-z]{3,10}$/ } });
 // already created having name(string), surname(string), age(Number), active(Boolean) fields.
 
 const mongoose = require('mongoose');
-mongoose.connect('mongodb://localhost:27017/yourDatabaseName', { useNewUrlParser: true, useUnifiedTopology: true })
+mongoose.connect('mongodb://localhost:27017/yourDatabaseName')
     .then(() => {
         console.log('Connected to MongoDB');
-        
         // Define the schema and model (if not already defined elsewhere)
         const Student = mongoose.model('Student', studentSchema);
         const students = [
@@ -312,7 +311,7 @@ db.student.find({ age: { $gt: 15 }, name: "BBB" }).explain("executionStats");
 //  (5)city allowed values are “baroda”,”surat” and “ahmedabad” only
 
 const mongoose = require('mongoose');
-mongoose.connect('mongodb://localhost:27017/yourDatabaseName', { useNewUrlParser: true, useUnifiedTopology: true })
+mongoose.connect('mongodb://localhost:27017/yourDatabaseName')
     .then(() => {
         console.log('Connected to MongoDB');
     
@@ -388,6 +387,7 @@ module.exports = User1;
 
 
 //app.js
+const app = express();
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
@@ -395,7 +395,6 @@ const User1 = require('./models/user1');
 const path = require('path');
 
 
-const app = express();
 mongoose.connect('mongodb://localhost:27017/loginDB',)
 .then(() => console.log('Connected to MongoDB'))
 .catch(err => console.error('MongoDB connection error:', err));
@@ -456,8 +455,6 @@ const recordSchema = new mongoose.Schema({
         required: true
     }
 });
-
-// Create the model
 const Record = mongoose.model('Record', recordSchema);
 module.exports = Record;
 
@@ -570,7 +567,7 @@ const Student2 = mongoose.model('Student', studentSchemaa);
 app.post('/add-student', async (req, res) => {
     const { name, rollno, totalmarks } = req.body;
 
-    const student = new Student({ name, rollno, totalmarks });
+    const student = new Student2({ name, rollno, totalmarks });
     await student.save();
 });app.listen(5000)
 
@@ -587,11 +584,7 @@ const StudentForm2 = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            await axios.post('http://localhost:5000/add-student', {
-                name,
-                rollno,
-                totalmarks
-            });
+            await axios.post('http://localhost:5000/add-student', {name,rollno,totalmarks});
             setName('');
             setRollno('');
             setTotalmarks('');
